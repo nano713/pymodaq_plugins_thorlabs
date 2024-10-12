@@ -329,10 +329,10 @@ class Piezo(Kinesis):
     
     def move_abs(self, position : float, callback = None):
         min_volt = 0.0 
-        max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage()) 
-        print('Max Voltage:', max_volt)
+        max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage())
+
         if position >= min_volt and position <= max_volt:
-           self._device.SetOutputVoltage(Decimal(position)) 
+           self._device.SetOutputVoltage(Decimal(position))
         else:
             raise ValueError('Invalid Voltage')
 

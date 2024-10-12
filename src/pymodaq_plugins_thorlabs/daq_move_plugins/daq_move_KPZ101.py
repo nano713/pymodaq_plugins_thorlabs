@@ -123,7 +123,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         """
         self._move_done = False
         position = self.check_bound(position)
-        self.target_position = position
+        self.target_value = position
         position = self.set_position_with_scaling(position)
 
         self.controller.move_abs(position.value())
@@ -143,7 +143,8 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         """
         Move the Kinesis Piezo Stage to home position
         """
-        self.controller.home(callback=self.move_done)
+        self._move_done = False
+        self.controller.home(callback=None)
 
 
 if __name__ == '__main__':
