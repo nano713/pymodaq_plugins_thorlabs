@@ -311,6 +311,8 @@ if __name__ == '__main__':
 
 
 class Piezo(Kinesis):
+    default_units = 'V'
+
     def __init__(self):
         self._device: KCubePiezo.KCubePiezo = None
         self._connect = None
@@ -327,10 +329,10 @@ class Piezo(Kinesis):
     
     def move_abs(self, position : float, callback = None):
         min_volt = 0.0 
-        max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage()) 
-        print('Max Voltage:', max_volt)
+        max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage())
+
         if position >= min_volt and position <= max_volt:
-           self._device.SetOutputVoltage(Decimal(position)) 
+           self._device.SetOutputVoltage(Decimal(position))
         else:
             raise ValueError('Invalid Voltage')
 
@@ -340,15 +342,27 @@ class Piezo(Kinesis):
         else:
             callback = 0
 
+        # pos = DataActuator(
+        #     data=0,
+        #     units=self.controller.get_units(),
+        # )
+
         self.move_abs(0.0)
 
     def get_position(self):
         voltage = Decimal.ToDouble(self._device.GetOutputVoltage())
         return voltage
-    
+
+    def get_units(self, *args, **kwargs) -> str:
+        # print(type(super().get_units()))
+        # return super().get_units('')
+        return self.default_units
+
     def stop(self):
         pass   
 
     def close(self):
         self._device.Disconnect()
+
+
     
