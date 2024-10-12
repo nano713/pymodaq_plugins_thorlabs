@@ -1,5 +1,6 @@
-from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, main, comon_parameters_fun, DataActuatorType
-#from pymodaq.utils.daq_utils import ThreadCommand
+from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, main, comon_parameters_fun, DataActuatorType, DataActuator
+#from pymodaq.utils.daq_utils import
+
 #from pymodaq.utils.parameter import Parameter
 from pymodaq.utils.logger import set_logger, get_module_name
 
@@ -27,6 +28,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
               ] + comon_parameters_fun(is_multiaxes, axis_names=_axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
+        self._move_done = False
         try:
             self.controller: Piezo = None
             self.settings.child('bounds', 'is_bounds').setValue(True)
@@ -91,30 +93,51 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
             DAQ_Move_base.get_position_with_scaling, daq_utils.ThreadCommand
         """
         
-        pos = self.controller.get_position()
+        # pos = self.controller.get_position()
+        # pos = self.get_position_with_scaling(pos)
+        pos = DataActuator(
+            data=self.controller.get_position(),
+            units=self.controller.get_units(),
+        )
         pos = self.get_position_with_scaling(pos)
         return pos
 
-    def move_abs(self, position):
+    # def get_actuator_value(self):
+    #     """Get the current value from the hardware with scaling conversion.
+    #
+    #     Returns
+    #     -------
+    #     float: The position obtained after scaling conversion.
+    #     """
+    #     # pos = DataActuator(
+    #     #     data=self.controller.get_position(self.axis_value),
+    #     #     units=self.controller.get_units(self.axis_value)
+    #     # )
+    #     pos = self.get_position_with_scaling(pos)
+    #     return pos
+
+
+    def move_abs(self, position: DataActuator):
         """
         Set the current position with voltage conversion of the Kinesis instrument 
         """
-        
+        self._move_done = False
         position = self.check_bound(position)
         self.target_position = position
         position = self.set_position_with_scaling(position)
 
-        self.controller.move_abs(position) 
+        self.controller.move_abs(position.value())
 
-    def move_rel(self, position):
+    def move_rel(self, position: DataActuator):
         """
         Moves the Kinesis Piezo Stage relatively to the current position. 
         """
+        self._move_done = False
         position = self.check_bound(self.current_position + position) - self.current_position
         self.target_position = position + self.current_position
         position = self.set_position_relative_with_scaling(position)
 
-        self.controller.move_abs(self.target_position)
+        self.controller.move_abs(self.target_position.value())
 
     def move_home(self):
         """

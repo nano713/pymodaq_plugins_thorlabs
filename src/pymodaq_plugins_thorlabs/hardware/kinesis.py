@@ -311,6 +311,8 @@ if __name__ == '__main__':
 
 
 class Piezo(Kinesis):
+    default_units = 'V'
+
     def __init__(self):
         self._device: KCubePiezo.KCubePiezo = None
         self._connect = None
@@ -340,15 +342,27 @@ class Piezo(Kinesis):
         else:
             callback = 0
 
+        # pos = DataActuator(
+        #     data=0,
+        #     units=self.controller.get_units(),
+        # )
+
         self.move_abs(0.0)
 
     def get_position(self):
         voltage = Decimal.ToDouble(self._device.GetOutputVoltage())
         return voltage
-    
+
+    def get_units(self, *args, **kwargs) -> str:
+        # print(type(super().get_units()))
+        # return super().get_units('')
+        return self.default_units
+
     def stop(self):
         pass   
 
     def close(self):
         self._device.Disconnect()
+
+
     
