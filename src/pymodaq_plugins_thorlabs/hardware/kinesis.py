@@ -317,24 +317,30 @@ class Piezo(Kinesis):
         self._device: KCubePiezo.KCubePiezo = None
         self._connect = None
 
+    # def connect(self, serial: int):
+    #     if serial in serialnumbers_piezo:
+    #         self._device = KCubePiezo.KCubePiezo.CreateKCubePiezo(serial)
+    #         super().connect(serial)
+    #         self._device.EnableDevice()
+    #         if not (self._device.IsSettingsInitialized()):
+    #             raise (Exception("no Stage Connected"))
+    #     else:
+    #         raise ValueError('Invalid Serial Number')
     def connect(self, serial: int):
         if serial in serialnumbers_piezo:
-            self._device = KCubePiezo.KCubePiezo.CreateKCubePiezo(serial)
-            super().connect(serial)
-            self._device.EnableDevice() 
-            if not (self._device.IsSettingsInitialized()):
-                raise (Exception("no Stage Connected"))
-        else:
-            raise ValueError('Invalid Serial Number')
-    
-    def move_abs(self, position : float, callback = None):
-        min_volt = 0.0 
-        max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage())
+            self._device = (
+                KCubePiezo.KCubePiezo.CreateKCubePiezo(serial))
+            self._device.Connect(serial)
 
-        if position >= min_volt and position <= max_volt:
-           self._device.SetOutputVoltage(Decimal(position))
-        else:
-            raise ValueError('Invalid Voltage')
+    def move_abs(self, position : float, callback = None):
+        self._device.SetOutputVoltage(Decimal(position))
+        # min_volt = 0.0
+        # max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage())
+        #
+        # if position >= min_volt and position <= max_volt:
+        #    self._device.SetOutputVoltage(Decimal(position))
+        # else:
+        #     raise ValueError('Invalid Voltage')
 
     def home(self, callback=None):
         if callback is not None:
