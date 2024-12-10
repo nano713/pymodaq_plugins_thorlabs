@@ -75,7 +75,7 @@ class UPLEDXXX:
             self.lib.TLUP_setLedUseNonThorlabsLed(up_handle, 1)
 
             # Make sure the LED is switched off (0 = off, 1 = on)
-            self.lib.TLUP_switchLedOutput(up_handle, 0)
+            self.lib.TLUP_switchLedOutput(up_handle, 0) # This should be a exclusive, separate method def xxx(self, output) where output = 0 or 1.
 
             # Get information about the connected LED
             current_setpoint = ctypes.c_double()
