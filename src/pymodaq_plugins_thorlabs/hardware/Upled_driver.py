@@ -1,23 +1,26 @@
 import ctypes
 import os
 import time
+import logging
+logger = logging.getLogger(__name__)
 
-from _ctypes import byref
+from _ctypes import byref # DK - delete
 
 # define dll path(dynamic link library)
-dll_path = r"C:\Program Files\IVI Foundation\VISA\Win64\Bin"
+dll_path = r"C:\Program Files\IVI Foundation\VISA\Win64\Bin" # Write a full path
 # change directory to the dll path.
 os.chdir(dll_path)
 # This line loads the DLL file named "TLUp_64.dll" using the ctypes library.
-lib = ctypes.cdll.LoadLibrary("TLUp_64.dll")
+lib = ctypes.cdll.LoadLibrary("TLUp_64.dll") # DK - delete because this is duplicated
 
 
 # AK question:from where this TLUp_64.dll file is there in bin folder?
 
 class UPLEDXXX:
+    # delete lib_path. Instead, define lib_path before declaring this class.
     def __init__(self, lib_path, resource_name):
         self.lib = ctypes.cdll.LoadLibrary(lib_path)
-        self.resource_name = resource_name
+        self.resource_name = resource_name # DK - delete because we use serial number to initialize, not resource_name in this instrument
         self.Upled_handle = ctypes.c_int(0)
 
     # def __init__(self, resource_name):
@@ -28,18 +31,21 @@ class UPLEDXXX:
     # def load_library(self):
     # os.chdir(self.dll_path)
     # self.lib = ctypes.cdll.LoadLibrary("TLCCS_64.dll")
+
+    # DK- Merge into connect method
     def count_devices(self):
         # Count upSeries devices
         device_count = ctypes.c_uint32()
         self.lib.TLUP_findRsrc(0, byref(device_count))
         if device_count.value > 0:
-            return f"Number of upSeries devices found: {device_count.value}"
+            logger.info(f"Number of upSeries devices found: {device_count.value}")
         else:
-            return "No upSeries devices found."
+            return "No upSeries devices found." # DK - similarly, use logger.info
 
-    def connect(self):
-        # Connect to the device using DLL's init function
-        self._device = self.lib.tlUpled_init(self.resource_name, 1, 1, ctypes.byref(self.Upled_handle))
+    # DK - use serialNumber to initialize the instrument
+    def get_connection_info(self):
+        # Connect to the device using DLL's init function. Correct because there is no tlUpled_init method.
+        self._device = self.lib.tlUpled_init(self.resource_name, 1, 1, ctypes.byref(self.Upled_handle)) # DK - delete
         if self._device != 0:
             raise Exception("Failed to initialize the device")
 
@@ -53,7 +59,7 @@ class UPLEDXXX:
             "serial_number": self.serial_number.value.decode()
         }
 
-    def initialize_first_device(self):
+    def connect(self):
         # Initialize the first connected upSeries device
         up_name = ctypes.create_string_buffer(256)
         self.lib.TLUP_getRsrcName(0, 0, up_name)
@@ -62,6 +68,7 @@ class UPLEDXXX:
         if res != 0:
             raise Exception("Failed to initialize the first upSeries device")
 
+    # DK - def get_info(self):
         # If the device is an upLED, execute this section
         if self.model_name.value.decode() == "upLED":
             # Enable the use of LEDs without EEPROM (non-Thorlabs or unmounted LEDs)
@@ -76,6 +83,7 @@ class UPLEDXXX:
             led_serial_number = ctypes.create_string_buffer(256)
             led_current_limit = ctypes.c_double()
             led_forward_voltage = ctypes.c_double()
+            # DK - led_wavelength = ...
 
             self.lib.TLUP_getLedInfo(up_handle, led_name, led_serial_number, byref(led_current_limit),
                                      byref(led_forward_voltage))
@@ -88,7 +96,7 @@ class UPLEDXXX:
                 "led_wavelength": led_wavelength.value
             }
         else:
-            return "The connected device is not an upLED."
+            logger.warning("The connected device is not an upLED.")
 
     # def connect(self):
     #     # connect to the device using DLL's init function'
@@ -97,7 +105,7 @@ class UPLEDXXX:
     #     print("Model name: ", self.model_name.value.decode(), ", Serial number: ", self.serial_number.value.decode())
     #     print()
     def close(self):
-        lib.tlUpled_close(self.Upled_handle)
+        lib.tlUpled_close(self.Upled_handle) # Correct lib method name
         # DK - replace pass with the command.
 
     #  self.lib.tlccs_close(self.ccs_handle)  # when writing your own plugin replace this line
