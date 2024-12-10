@@ -1,4 +1,3 @@
-
 import ctypes
 import os
 import time
@@ -10,21 +9,25 @@ dll_path = r"C:\Program Files\IVI Foundation\VISA\Win64\Bin"
 # change directory to the dll path.
 os.chdir(dll_path)
 # This line loads the DLL file named "TLUp_64.dll" using the ctypes library.
-lib=ctypes.cdll.LoadLibrary("TLUp_64.dll")
+lib = ctypes.cdll.LoadLibrary("TLUp_64.dll")
+
+
 # AK question:from where this TLUp_64.dll file is there in bin folder?
+
 class UPLEDXXX:
     def __init__(self, lib_path, resource_name):
         self.lib = ctypes.cdll.LoadLibrary(lib_path)
         self.resource_name = resource_name
         self.Upled_handle = ctypes.c_int(0)
+
     # def __init__(self, resource_name):
-        # self.dll_path = r"C:\Program Files\IVI Foundation\VISA\Win64\Bin"  # DK - Replace dll_path with C://Program Files//IVI Foundation//VISA//Win64//Bin...?
-        # self.resource_name = resource_name#.encode('utf-8')
-        # self.lib = None
-        # self.Upled_handle = ctypes.c_int(0)
-        # def load_library(self):
-        # os.chdir(self.dll_path)
-        # self.lib = ctypes.cdll.LoadLibrary("TLCCS_64.dll")
+    # self.dll_path = r"C:\Program Files\IVI Foundation\VISA\Win64\Bin"  # DK - Replace dll_path with C://Program Files//IVI Foundation//VISA//Win64//Bin...?
+    # self.resource_name = resource_name#.encode('utf-8')
+    # self.lib = None
+    # self.Upled_handle = ctypes.c_int(0)
+    # def load_library(self):
+    # os.chdir(self.dll_path)
+    # self.lib = ctypes.cdll.LoadLibrary("TLCCS_64.dll")
     def count_devices(self):
         # Count upSeries devices
         device_count = ctypes.c_uint32()
@@ -74,7 +77,6 @@ class UPLEDXXX:
             led_current_limit = ctypes.c_double()
             led_forward_voltage = ctypes.c_double()
 
-
             self.lib.TLUP_getLedInfo(up_handle, led_name, led_serial_number, byref(led_current_limit),
                                      byref(led_forward_voltage))
 
@@ -87,8 +89,6 @@ class UPLEDXXX:
             }
         else:
             return "The connected device is not an upLED."
-
-
 
     # def connect(self):
     #     # connect to the device using DLL's init function'
