@@ -112,8 +112,8 @@ class DAQ_0DViewer_TLPMPowermeter(DAQ_Viewer_base):
             =============== ======== ===============================================
         """
         data_tot = [np.array([self.controller.get_power()])]
-        self.dte_signal.emit([DataToExport(name='Powermeter', data=[DataFromPlugins(name = 'PM101', data = data_tot,
-                                                      dim='Data0D', labels=['Power (W)'])],)])
+        self.dte_signal.emit(DataToExport(name='Powermeter', data=[DataFromPlugins(name = 'PM101', data = data_tot,
+                                                      dim='Data0D', labels=['Power (W)'])],))
 
 
     def stop(self):
