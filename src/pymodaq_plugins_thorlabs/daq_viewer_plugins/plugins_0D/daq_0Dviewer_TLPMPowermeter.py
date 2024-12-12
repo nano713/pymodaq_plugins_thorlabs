@@ -55,14 +55,16 @@ class DAQ_0DViewer_TLPMPowermeter(DAQ_Viewer_base):
             daq_utils.ThreadCommand
         """
         self.status.update(edict(initialized=False, info="", x_axis=None, y_axis=None, controller=None))
+        self.ini_detector_init(slave_controller = controller)
         try:
 
-            if self.settings.child(('controller_status')).value() == "Slave":
-                if controller is None:
-                    raise Exception('no controller has been defined externally while this detector is a slave one')
-                else:
-                    self.controller = controller
-            else:
+            if self.is_master:
+
+            # if self.settings.child(('controller_status')).value() == "Slave":
+            #     if controller is None:
+            #         raise Exception('no controller has been defined externally while this detector is a slave one')
+            #     else:
+            #         self.controller = controller
                 index = DEVICE_NAMES.index(self.settings['devices'])
                 self.controller = CustomTLPM()
                 info = self.controller.infos.get_devices_info(index)
