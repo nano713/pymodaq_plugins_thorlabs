@@ -18,7 +18,7 @@ plugin using the Instrumental_lib package directly interfacing the C library wit
 """
 from easydict import EasyDict as edict
 from pymodaq.utils.daq_utils import ThreadCommand, getLineInfo
-from pymodaq.utils.data import DataFromPlugins
+from pymodaq.utils.data import DataFromPlugins, DataToExport
 from pymodaq.control_modules.viewer_utility_classes import DAQ_Viewer_base, main
 
 import numpy as np
@@ -55,14 +55,16 @@ class DAQ_0DViewer_TLPMPowermeter(DAQ_Viewer_base):
             daq_utils.ThreadCommand
         """
         self.status.update(edict(initialized=False, info="", x_axis=None, y_axis=None, controller=None))
+        self.ini_detector_init(slave_controller = controller)
         try:
 
-            if self.settings.child(('controller_status')).value() == "Slave":
-                if controller is None:
-                    raise Exception('no controller has been defined externally while this detector is a slave one')
-                else:
-                    self.controller = controller
-            else:
+            if self.is_master:
+
+            # if self.settings.child(('controller_status')).value() == "Slave":
+            #     if controller is None:
+            #         raise Exception('no controller has been defined externally while this detector is a slave one')
+            #     else:
+            #         self.controller = controller
                 index = DEVICE_NAMES.index(self.settings['devices'])
                 self.controller = CustomTLPM()
                 info = self.controller.infos.get_devices_info(index)
@@ -109,9 +111,9 @@ class DAQ_0DViewer_TLPMPowermeter(DAQ_Viewer_base):
             *Naverage*      int       Number of values to average
             =============== ======== ===============================================
         """
-        data = [np.array([self.controller.get_power()])]
-        self.data_grabed_signal.emit([DataFromPlugins(name='Powermeter', data=data,
-                                                      dim='Data0D', labels=['Power (W)'],)])
+        data_tot = [np.array([self.controller.get_power()])]
+        self.dte_signal.emit([DataToExport(name='Powermeter', data=[DataFromPlugins(name = 'PM101', data = data_tot,
+                                                      dim='Data0D', labels=['Power (W)'])],)])
 
 
     def stop(self):
