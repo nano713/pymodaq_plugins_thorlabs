@@ -5,9 +5,10 @@ Created the 15/06/2023
 @author: Sebastien Weber
 """
 
-from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, comon_parameters_fun, main  # common set of parameters for all actuators
+from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, comon_parameters_fun, main, DataActuatorType, DataActuator  # common set of parameters for all actuators
 from pymodaq.utils.daq_utils import ThreadCommand # object used to send info back to the main thread
 from pymodaq.utils.parameter import Parameter
+from typing import Union, List, Dict
 
 from elliptec import Controller, Rotator
 from elliptec.scan import find_ports, scan_for_devices
@@ -30,14 +31,15 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     """
     _controller_units = ''
     is_multiaxes = True
-    axes_names = ['0']
-    _epsilon = 0.1
+    _axis_names: Union[List[str], Dict[str, int]] = {'0': 0}
+    _controller_units: Union[str, List[str]] = ''
+    _epsilon: Union[float, List[float]] = 0.1
 
     params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'limits': com_ports},
                {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
                {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
                {'title': 'Range', 'name': 'range', 'type': 'str'},
-               ] + comon_parameters_fun(is_multiaxes, axes_names, epsilon=_epsilon)
+               ] + comon_parameters_fun(is_multiaxes, axis_names = _axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
         self.controller: Rotator = None
@@ -49,8 +51,8 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         -------
         float: The position obtained after scaling conversion.
         """
-        pos = self.controller.get_angle()
-        pos = self.get_position_with_scaling(pos)
+        pos = DataActuator(data = self.controller.get_angle())
+        pos = self.get_position_with_scaling(pos)   
         return pos
 
     def close(self):
