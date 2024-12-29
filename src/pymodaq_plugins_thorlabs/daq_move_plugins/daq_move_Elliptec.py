@@ -112,7 +112,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         initialized = True
         return info, initialized
 
-    def move_abs(self, value):
+    def move_abs(self, value: DataActuator):
         """ Move the actuator to the absolute target defined by value
 
         Parameters
@@ -126,7 +126,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
 
         self.controller.set_angle(value)  # when writing your own plugin replace this line
 
-    def move_rel(self, value):
+    def move_rel(self, value: DataActuator):
         """ Move the actuator to the relative target actuator value defined by value
 
         Parameters
