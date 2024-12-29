@@ -88,13 +88,15 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         initialized: bool
             False if initialization failed otherwise True
         """
-        serial = Controller(self.settings['com_port'])
-        self.controller = self.ini_stage_init(old_controller=controller,
-                                              new_controller=Rotator(serial))
-        all_info = self.controller.get('info')
-        self.settings.child('serial').setValue(all_info['Serial No.'])
-        self.settings.child('motor').setValue(all_info['Motor Type'])
-        self.settings.child('range').setValue(all_info['Range'])
+        self.ini_stage_init(slave_controller=controller)
+
+        if self.is_master: 
+            serial = Controller(self.settings['com_port'])
+            self.controller = Rotator(serial)
+            all_info = self.controller.get('info')
+            self.settings.child('serial').setValue(all_info['Serial No.'])
+            self.settings.child('motor').setValue(all_info['Motor Type'])
+            self.settings.child('range').setValue(all_info['Range'])
         """
         info = {'Address': addr,
                 'Motor Type': int(msg[3:5], 16),
