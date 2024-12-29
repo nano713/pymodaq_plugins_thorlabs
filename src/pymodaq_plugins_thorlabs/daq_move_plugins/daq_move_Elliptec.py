@@ -6,7 +6,7 @@ Created the 15/06/2023
 """
 
 from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, comon_parameters_fun, main, DataActuatorType, DataActuator  # common set of parameters for all actuators
-from pymodaq.utils.daq_utils import ThreadCommand # object used to send info back to the main thread
+from pymodaq.utils.daq_utils import ThreadCommand 
 from pymodaq.utils.parameter import Parameter
 from typing import Union, List, Dict
 
@@ -120,11 +120,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         value: (float) value of the absolute target positioning
         """
 
-        value = self.check_bound(value)  #if user checked bounds, the defined bounds are applied here
+        value = self.check_bound(value)  
         self.target_value = value
-        value = self.set_position_with_scaling(value)  # apply scaling if the user specified one
+        value = self.set_position_with_scaling(value)
 
-        self.controller.set_angle(value)  # when writing your own plugin replace this line
+        self.controller.set_angle(value)
 
     def move_rel(self, value: DataActuator):
         """ Move the actuator to the relative target actuator value defined by value
@@ -137,11 +137,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        self.controller.shift_angle(value)  # when writing your own plugin replace this line
+        self.controller.shift_angle(value) 
 
     def move_home(self):
         """Call the reference method of the controller"""
-        self.controller.home()  # when writing your own plugin replace this line
+        self.controller.home()  
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def stop_motion(self):
