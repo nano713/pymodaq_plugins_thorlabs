@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 elliptec_path = 'C:\\Program Files\\Thorlabs\\Elliptec'
 sys.path.append(elliptec_path)
 
-clr.addReference("Thorlabs.Elliptec.ELLO_DLL.dll")
+clr.AddReference("Thorlabs.Elliptec.ELLO_DLL")
 
 from Thorlabs.Elliptec.ELLO_DLL import ELLDevicePort, ELLDevices, ELLBaseDevice
 
@@ -27,7 +27,7 @@ class Elliptec:
        device_info = self.elliptec_address.DeviceInfo()
        logger.info(f'Device info: {device_info}')
 
-    
+    #ELLBaseDevice or ELLDevices? 
     def move_abs(self, value): 
         self.elliptec_address.MoveAbsolute(Decimal(value))
     
