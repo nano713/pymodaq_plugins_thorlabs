@@ -23,9 +23,11 @@ class Elliptec:
        elliptec = self.controller.ScanAddresses(self.min_add, self.max_add)
        logger.info(f'Connected to Elliptec device at {com_port}')
 
-       self.elliptec_address = self.controller.AddressedDevice(elliptec[0])
-       device_info = self.elliptec_address.DeviceInfo()
-       logger.info(f'Device info: {device_info}')
+       if elliptec in device: 
+           if device[0] != None: 
+            self.elliptec_address = ELLDevices.AddressedDevice(elliptec)
+            device_info = self.elliptec_address.DeviceInfo()
+            logger.info(f'Device info: {device_info}')
 
     #ELLBaseDevice or ELLDevices? 
     def move_abs(self, value): 
