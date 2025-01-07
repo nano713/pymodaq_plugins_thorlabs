@@ -9,7 +9,8 @@ sys.path.append(elliptec_path)
 
 clr.AddReference("Thorlabs.Elliptec.ELLO_DLL")
 
-from Thorlabs.Elliptec.ELLO_DLL import ELLDevicePort, ELLDevices, ELLBaseDevice
+from Thorlabs.Elliptec.ELLO_DLL import ELLDevicePort, ELLDevices, ELLBaseDevice, DeviceID # DK - is this correct? I thought ELLO_DLL class comes from dll.
+                                                                                        # AD -> No. These are the classes. ELLO_DLL is the name of the dll not the classS
 
 class Elliptec: 
     def __init__(self): 
@@ -18,8 +19,9 @@ class Elliptec:
         self.min_add = '0'
         self.max_add = 'F'
     
-    def connect(self, com_port): 
+    def connect(self, com_port, device_type): 
        ELLDevicePort.Connect(com_port)
+       DeviceID.DeviceTypes(device_type) # enable way for device_type to be read
        elliptec = self.controller.ScanAddresses(self.min_add, self.max_add)
        logger.info(f'Connected to Elliptec device at {com_port}')
 
@@ -39,7 +41,11 @@ class Elliptec:
     def home(self): 
         self.elliptec_address.Home(ELLBaseDevice.DeviceDirection.Clockwise)
     
-    def get_psotion(self): 
+    def get_position(self): 
         logger.info(f'Current position: {self.elliptec_address.GetPosition()}')
         return self.elliptec_address.GetPosition()
        
+    # method to get device type
+    
+    # method to set units
+    
