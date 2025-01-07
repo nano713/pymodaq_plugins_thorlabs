@@ -9,6 +9,7 @@ from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, comon_pa
 from pymodaq.utils.daq_utils import ThreadCommand 
 from pymodaq.utils.parameter import Parameter
 from typing import Union, List, Dict
+from pymodaq_plugins_thorlabs.hardware.elliptec import Elliptec
 
 from elliptec import Controller, Rotator
 from elliptec.scan import find_ports, scan_for_devices
@@ -35,14 +36,15 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     _controller_units: Union[str, List[str]] = ''
     _epsilon: Union[float, List[float]] = 0.1
 
-    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'limits': com_ports},
+    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'value': 'COM12'},
+              {'title': 'Device Type', 'name': 'device_type', 'type': 'readonly'},
                {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
                {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
                {'title': 'Range', 'name': 'range', 'type': 'str'},
                ] + comon_parameters_fun(is_multiaxes, axis_names = _axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
-        self.controller: Rotator = None
+        self.controller: Elliptec() = None
 
     def get_actuator_value(self):
         """Get the current value from the hardware with scaling conversion.
@@ -51,7 +53,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         -------
         float: The position obtained after scaling conversion.
         """
-        pos = DataActuator(data = self.controller.get_angle())
+        pos = DataActuator(data = self.controller.get_position)
         pos = self.get_position_with_scaling(pos)   
         return pos
 
@@ -91,9 +93,14 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.ini_stage_init(slave_controller=controller)
 
         if self.is_master: 
+            self.controller = Elliptec()
+            self.controller.connect(self.settings['com_port'])
+
             serial = Controller(self.settings['com_port'])
-            self.controller = Rotator(serial)
-            all_info = self.controller.get('info')
+            self.rotator = Rotator(serial)
+
+            #Gather all info from instrument 
+            all_info = self.rotator.get('info')
             self.settings.child('serial').setValue(all_info['Serial No.'])
             self.settings.child('motor').setValue(all_info['Motor Type'])
             self.settings.child('range').setValue(all_info['Range'])
@@ -108,7 +115,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
                 'Range': (int(msg[21:25], 16)),
                 'Pulse/Rev': (int(msg[25:], 16))}
         """
-        info = str(all_info)
+        info = str(all_info) # Not from Elliptec() class
         initialized = True
         return info, initialized
 
@@ -124,7 +131,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value
         value = self.set_position_with_scaling(value)
 
-        self.controller.set_angle(value)
+        self.controller.move_abs(value)
 
     def move_rel(self, value: DataActuator):
         """ Move the actuator to the relative target actuator value defined by value
@@ -137,7 +144,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        self.controller.shift_angle(value) 
+        self.controller.move_rel(value) 
 
     def move_home(self):
         """Call the reference method of the controller"""
