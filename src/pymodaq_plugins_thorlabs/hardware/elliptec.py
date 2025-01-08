@@ -16,24 +16,24 @@ class Elliptec:
     def __init__(self): 
         self.controller = ELLDevices()
         self.device_type = []
+        self.device_info = None
         self.elliptec_list = []
         self.min_add = '0'
         self.max_add = 'F'
     
     def connect(self, com_port, device_type): 
-       ELLDevicePort.Connect(com_port) # com_port=COM12
-       DeviceID.DeviceTypes(device_type) # enable way for device_type to be read
-       if device_type == 4: 
-           
+       ELLDevicePort.Connect(com_port) # com_port=COM12        
            
        elliptec = self.controller.ScanAddresses(self.min_add, self.max_add)
        logger.info(f'Connected to Elliptec device at {com_port}')
-
+       
        for device in elliptec: 
-           if device != None: 
-            self.elliptec_list = ELLDevices.AddressedDevice(elliptec[0])
-            device_info = self.elliptec_list.DeviceInfo()
-            logger.info(f'Device info: {device_info}')
+           if self.controller.Configure(device): 
+                self.elliptec_list = self.controller.AddressedDevice(device[0])
+                self.device_info = self.elliptec_list.DeviceInfo
+                for stri in self.device_info.Description():
+                    print(stri)
+                #logger.info(f'Device info: {device_info}')
 
     #ELLBaseDevice or ELLDevices? 
     def move_abs(self, value): 
@@ -43,24 +43,22 @@ class Elliptec:
         self.elliptec_list.MoveRelative(Decimal(value))
     
     def home(self): 
-        if self.devic # DK fix this line.
-        self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Clockwise) # DK - in linear stage, we need ELLBaseDevice.DeviceDirection.Linear attribute. Can we address multiple device types?
+         # DK fix this line.
+        self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Linear) # DK - in linear stage, we need ELLBaseDevice.DeviceDirection.Linear attribute. Can we address multiple device types?
     
     def get_position(self): 
         logger.info(f'Current position: {self.elliptec_list.GetPosition()}')
-        return self.elliptec_list.GetPosition()
+        return float(str(self.elliptec_list.get_Position()))
 
     def get_device_type(self): 
         # return string and value 
-        return self.device_type
-    def set_device_types(self, device_type): #device_type only 14 or 20 based on params
-        self.device_type = DeviceID.DeviceTypes(device_type)
+        return str(self.device_info.get_DeviceType())
+    
+    # def set_device_types(self, device_type): #device_type only 14 or 20 based on params
+    #     self.device_type = DeviceID.DeviceTypes(device_type)
 
-    def set_units(self): 
-        if self.get_device_type() == 3 or 7: # make sure if ELL20 is 20, ELL14 is 14, etc
-             DeviceID.UnitTypes('MM')
-        elif self.get_device_type() == 4 or 8:
-            DeviceID.UnitTypes('Degrees')
+    def get_units(self): 
+        return self.device_info.Units
             
     # method to get device type
     
