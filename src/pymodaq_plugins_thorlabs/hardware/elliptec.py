@@ -43,9 +43,13 @@ class Elliptec:
         self.elliptec_list.MoveRelative(Decimal(value))
     
     def home(self): 
-         # DK fix this line.
-        self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Linear) # DK - in linear stage, we need ELLBaseDevice.DeviceDirection.Linear attribute. Can we address multiple device types?
-    
+        if self.get_device_type == "LinearStage":
+            self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Linear)
+        elif self.get_device_type == "RotaryStage":
+            self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Clockwise)
+        else:
+            logger.error(f'Unknown device type: {self.get_device_type}')
+            
     def get_position(self): 
         logger.info(f'Current position: {self.elliptec_list.GetPosition()}')
         return float(str(self.elliptec_list.get_Position()))
