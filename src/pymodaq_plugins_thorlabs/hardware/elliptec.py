@@ -49,17 +49,14 @@ class Elliptec:
             self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Clockwise)
         else:
             logger.error(f'Unknown device type: {self.get_device_type}')
-            
+
     def get_position(self): 
         logger.info(f'Current position: {self.elliptec_list.GetPosition()}')
         return float(str(self.elliptec_list.get_Position()))
 
     def get_device_type(self): 
-        # return string and value 
+        """Get the device type of the connected device"""
         return str(self.device_info.get_DeviceType())
-    
-    # def set_device_types(self, device_type): #device_type only 14 or 20 based on params
-    #     self.device_type = DeviceID.DeviceTypes(device_type)
 
     def get_units(self): 
         return self.device_info.Units
