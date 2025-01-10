@@ -73,6 +73,8 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
             self.axis_unit = self.controller.get_units(self.axis_value)
         if param.name() == 'range': 
             self.controller.set_range(param.value())
+        if param.name() == 'Serial No.':
+            self.controller.pick_device(self.settings['serial'])
         else:
             pass
 
