@@ -20,6 +20,17 @@ class Elliptec:
         self.elliptec_list = []
         self.min_add = '0'
         self.max_add = 'F'
+        self.device_address = []
+        
+    def pick_device(self, device_address):
+        boolean = self.controller.ReaddressDevice(device_address)
+        if boolean == True: 
+            if device_address not in self.device_address: 
+                self.device_address.append(device_address)
+        else: 
+            logger.error('Failed to pick device')
+        
+
     
     def connect(self, com_port, device_type): 
        ELLDevicePort.Connect(com_port) # com_port=COM12        
