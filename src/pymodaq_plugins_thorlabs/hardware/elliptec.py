@@ -21,7 +21,7 @@ class Elliptec:
         self.min_add = '0'
         self.max_add = 'F'
         self.device_address = []
-        
+
     def pick_device(self, device_address):
         boolean = self.controller.ReaddressDevice(device_address)
         if boolean == True: 
@@ -32,7 +32,7 @@ class Elliptec:
         
 
     
-    def connect(self, com_port, device_type): 
+    def connect(self, com_port): 
        ELLDevicePort.Connect(com_port) # com_port=COM12        
            
        elliptec = self.controller.ScanAddresses(self.min_add, self.max_add)
@@ -47,8 +47,8 @@ class Elliptec:
                 #logger.info(f'Device info: {device_info}')
 
     #ELLBaseDevice or ELLDevices? 
-    def move_abs(self, value): 
-        self.elliptec_list.MoveAbsolute(Decimal(value))
+    def move_abs(self, value, actuator): 
+        self.elliptec_list.MoveAbsolute(self.device_address[actuator-1], Decimal(value))
     
     def move_rel(self, value): 
         self.elliptec_list.MoveRelative(Decimal(value))
