@@ -47,17 +47,17 @@ class Elliptec:
                 #logger.info(f'Device info: {device_info}')
 
     #ELLBaseDevice or ELLDevices? 
-    def move_abs(self, value, actuator): 
+    def move_abs(self, actuator, value): 
         self.elliptec_list.MoveAbsolute(self.device_address[actuator-1], Decimal(value))
     
-    def move_rel(self, value): 
-        self.elliptec_list.MoveRelative(Decimal(value))
+    def move_rel(self, actuator, value): 
+        self.elliptec_list.MoveRelative(self.device_address[actuator-1], Decimal(value))
     
-    def home(self): 
+    def home(self, actuator): 
         if self.get_device_type == "LinearStage":
-            self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Linear)
+            self.elliptec_list.Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Linear)
         elif self.get_device_type == "RotaryStage":
-            self.elliptec_list.Home(ELLBaseDevice.DeviceDirection.Clockwise)
+            self.elliptec_list.Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Clockwise)
         else:
             logger.error(f'Unknown device type: {self.get_device_type}')
 
@@ -65,9 +65,9 @@ class Elliptec:
         logger.info(f'Current position: {self.elliptec_list.GetPosition()}')
         return float(str(self.elliptec_list.get_Position()))
 
-    def get_device_type(self): 
+    def get_device_type(self, actuator): 
         """Get the device type of the connected device"""
-        return str(self.device_info.get_DeviceType())
+        return str(self.device_info.get_DeviceType()) + str(actuator)
 
     def get_units(self): 
         return self.device_info.Units
