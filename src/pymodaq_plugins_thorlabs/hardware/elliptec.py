@@ -16,7 +16,7 @@ class Elliptec:
     def __init__(self): 
         self.controller = ELLDevices()
         self.device_type = []
-        self.device_info = None
+        self.device_info = []
         self.elliptec_list = []
         self.min_add = '0'
         self.max_add = 'F'
@@ -29,16 +29,20 @@ class Elliptec:
        elliptec = self.controller.ScanAddresses(self.min_add, self.max_add)
        
        logger.info(f'Connected to Elliptec device at {com_port}')
+       i = 0
        
        for device in elliptec: 
            if self.controller.Configure(device): 
-                self.elliptec_list = self.controller.AddressedDevice(device[0])
-                self.device_address.append(self.convert_to_char(self.elliptec_list.Address))
-                self.device_info = self.elliptec_list.DeviceInfo
-                for stri in self.device_info.Description():
+                self.elliptec_list.append(self.controller.AddressedDevice(device[0]))  
+                # self.elliptec_list = self.controller.AddressedDevice(device[0])
+                self.device_address.append(self.convert_to_char(self.elliptec_list[i].Address))
+                self.device_info.append(self.elliptec_list[i].DeviceInfo)
+                
+                for stri in self.device_info[i].Description():
                     units = self.extract_units(stri)
                     self.units.append(units)
                     print(stri)
+                i += 1
 
     def convert_to_char(self, address): 
         char_list = List[Char]()
@@ -56,30 +60,33 @@ class Elliptec:
 
     #ELLBaseDevice or ELLDevices? 
     def move_abs(self, actuator, value): 
-        boolean = self.elliptec_list.MoveAbsolute(self.device_address[actuator-1], Decimal(value)) # DK - I think the first attribute should be '1'/'2' or 1/2 because this is supposed to be 'address' in the documentation. 
+        """
+        actuator: index integer of the actuator to move
+        """
+        boolean = self.elliptec_list[actuator-1].MoveAbsolute(self.device_address[actuator-1], Decimal(value)) # DK - I think the first attribute should be '1'/'2' or 1/2 because this is supposed to be 'address' in the documentation. 
         return boolean
     
     def move_rel(self, actuator, value): 
-        boolean = self.elliptec_list.MoveRelative(self.device_address[actuator-1], Decimal(value))
+        boolean = self.elliptec_list[actuator-1].MoveRelative(self.device_address[actuator-1], Decimal(value))
         return boolean
     
     def home(self, actuator): 
-        if "LinearStage" in self.get_device_type:
-            boolean = self.elliptec_list.Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Linear)
+        if "LinearStage" in self.get_device_type(actuator):
+            boolean = self.elliptec_list[actuator-1].Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Linear)
             return boolean
-        elif "RotaryStage" in self.get_device_type:
-            boolean = self.elliptec_list.Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Clockwise)
+        elif "OpticsRotator" in self.get_device_type(actuator):
+            boolean = self.elliptec_list[actuator-1].Home(self.device_address[actuator-1], ELLBaseDevice.DeviceDirection.Clockwise)
             return boolean
         else:
-            logger.error(f'Unknown device type: {self.get_device_type}')
+            logger.error(f'Unknown device type: {self.get_device_type(actuator)}')
 
-    def get_position(self): 
-        logger.info(f'Current position: {self.elliptec_list.GetPosition()}')
-        return float(str(self.elliptec_list.get_Position()))
+    def get_position(self, actuator): 
+        logger.info(f'Current position: {self.elliptec_list[actuator-1].GetPosition()}')
+        return float(str(self.elliptec_list[actuator-1].get_Position()))
 
     def get_device_type(self, actuator): 
         """Get the device type of the connected device"""
-        return str(self.device_info.get_DeviceType()) +  str(actuator)
+        return str(self.device_info[actuator-1].get_DeviceType())
 
-    def get_units(self, actuator):  # DK - add address 
-        return self.units[actuator-1]
+    def get_units(self, actuator): 
+       return self.device_info[actuator-1].Units
