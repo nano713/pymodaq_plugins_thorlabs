@@ -133,7 +133,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value
         value = self.set_position_with_scaling(value)
 
-        self.controller.move_abs(value)
+        self.controller.move_abs(self.axis_value, value)
 
     def move_rel(self, value: DataActuator):
         """ Move the actuator to the relative target actuator value defined by value
