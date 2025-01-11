@@ -21,15 +21,8 @@ class Elliptec:
         self.min_add = '0'
         self.max_add = 'F'
         self.device_address = []
-
-    # def pick_device(self, device_address):
-    #     boolean = self.controller.ReaddressDevice(device_address)
-    #     if boolean == True: 
-    #         if device_address not in self.device_address: 
-    #             self.device_address.append(device_address)
-    #     else: 
-    #         logger.error('Failed to pick device')
-        
+        self.units = []
+    
     def connect(self, com_port): 
        ELLDevicePort.Connect(com_port) # com_port=COM12        
            
@@ -43,12 +36,23 @@ class Elliptec:
                 self.device_address.append(self.convert_to_char(self.elliptec_list.Address))
                 self.device_info = self.elliptec_list.DeviceInfo
                 for stri in self.device_info.Description():
+                    units = self.extract_units(stri)
+                    self.units.append(units)
                     print(stri)
 
     def convert_to_char(self, address): 
         char_list = List[Char]()
         char_list.Add(Char.Parse(address))
         return char_list
+    
+    def extract_units(self, device_info): 
+        for line in device_info:
+            if 'mm' in line: 
+                return 'mm'
+            elif 'deg' in line:
+                return 'deg'
+            else: 
+                return 'unknown'
 
     #ELLBaseDevice or ELLDevices? 
     def move_abs(self, actuator, value): 
@@ -77,5 +81,5 @@ class Elliptec:
         """Get the device type of the connected device"""
         return str(self.device_info.get_DeviceType()) +  str(actuator)
 
-    def get_units(self):  # DK - add address 
-        return self.device_info.Units
+    def get_units(self, actuator):  # DK - add address 
+        return self.units[actuator-1]
