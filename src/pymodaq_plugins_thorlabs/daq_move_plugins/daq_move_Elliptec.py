@@ -11,10 +11,10 @@ from pymodaq.utils.parameter import Parameter
 from typing import Union, List, Dict
 from pymodaq_plugins_thorlabs.hardware.elliptec import Elliptec
 
-from elliptec import Controller, Rotator
-from elliptec.scan import find_ports, scan_for_devices
+# from elliptec import Controller, Rotator
+# from elliptec.scan import find_ports, scan_for_devices
 
-com_ports = find_ports()
+# com_ports = find_ports()
 
 
 class DAQ_Move_Elliptec(DAQ_Move_base):
@@ -36,11 +36,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     _controller_units: Union[str, List[str]] = ''
     _epsilon: Union[float, List[float]] = 0.1
 
-    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'value': 'COM12'},
-              {'title': 'Device Type', 'name': 'device_type', 'type': 'readonly'},
-               {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
-               {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
-               {'title': 'Range', 'name': 'range', 'type': 'str'},
+    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'str', 'value': 'COM12'},
+              {'title': 'Device Type', 'name': 'device_type', 'type': 'str','readonly':True},
+            #    {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
+            #    {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
+            #    {'title': 'Range', 'name': 'range', 'type': 'str'},
                ] + comon_parameters_fun(is_multiaxes, axis_names = _axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
@@ -53,7 +53,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         -------
         float: The position obtained after scaling conversion.
         """
-        pos = DataActuator(data = self.controller.get_position)
+        pos = DataActuator(data = self.controller.get_position(self.axis.value), units = self.axis_units)
         pos = self.get_position_with_scaling(pos)   
         return pos
 
@@ -69,14 +69,12 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        if param.name() == 'axis': 
-            self.axis_unit = self.controller.get_units(self.axis_value)
-        if param.name() == 'range': 
-            self.controller.set_range(param.value())
-        if param.name() == 'Serial No.':
-            self.controller.pick_device(self.settings['serial'])
-        else:
-            pass
+        # if param.name() == 'axis': 
+        #     self.axis_unit = self.controller.get_units(self.axis_value)
+        # if param.name() == 'range': 
+        #     self.controller.set_range(param.value())
+        # else:
+        pass
 
     def ini_stage(self, controller=None):
         """Actuator communication initialization
@@ -98,14 +96,14 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
             self.controller = Elliptec()
             self.controller.connect(self.settings['com_port'])
 
-            serial = Controller(self.settings['com_port'])
-            self.rotator = Rotator(serial)
+            # serial = Controller(self.settings['com_port'])
+            # self.rotator = Rotator(serial)
 
-            #Gather all info from instrument 
-            all_info = self.rotator.get('info')
-            self.settings.child('serial').setValue(all_info['Serial No.'])
-            self.settings.child('motor').setValue(all_info['Motor Type'])
-            self.settings.child('range').setValue(all_info['Range'])
+            # #Gather all info from instrument 
+            # all_info = self.rotator.get('info')
+            # self.settings.child('serial').setValue(all_info['Serial No.'])
+            # self.settings.child('motor').setValue(all_info['Motor Type'])
+            # self.settings.child('range').setValue(all_info['Range'])
         """
         info = {'Address': addr,
                 'Motor Type': int(msg[3:5], 16),
@@ -117,7 +115,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
                 'Range': (int(msg[21:25], 16)),
                 'Pulse/Rev': (int(msg[25:], 16))}
         """
-        info = str(all_info) # Not from Elliptec() class
+        info = "Elliptec actuator initialized"
         initialized = True
         return info, initialized
 
@@ -146,11 +144,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        self.controller.move_rel(value) 
+        self.controller.move_rel(self.axis.value, value) 
 
     def move_home(self):
         """Call the reference method of the controller"""
-        self.controller.home()  
+        self.controller.home(self.axis.value)  
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def stop_motion(self):
