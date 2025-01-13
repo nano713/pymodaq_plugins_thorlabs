@@ -53,7 +53,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         -------
         float: The position obtained after scaling conversion.
         """
-        pos = DataActuator(data = self.controller.get_position)
+        pos = DataActuator(data = self.controller.get_position(self.axis.value), units = self.axis_units)
         pos = self.get_position_with_scaling(pos)   
         return pos
 
@@ -69,14 +69,12 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        if param.name() == 'axis': 
-            self.axis_unit = self.controller.get_units(self.axis_value)
-        if param.name() == 'range': 
-            self.controller.set_range(param.value())
-        if param.name() == 'Serial No.':
-            self.controller.pick_device(self.settings['serial'])
-        else:
-            pass
+        # if param.name() == 'axis': 
+        #     self.axis_unit = self.controller.get_units(self.axis_value)
+        # if param.name() == 'range': 
+        #     self.controller.set_range(param.value())
+        # else:
+        pass
 
     def ini_stage(self, controller=None):
         """Actuator communication initialization
