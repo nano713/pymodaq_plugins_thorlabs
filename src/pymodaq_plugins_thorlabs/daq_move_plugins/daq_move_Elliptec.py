@@ -38,9 +38,9 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
 
     params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'value': 'COM12'},
               {'title': 'Device Type', 'name': 'device_type', 'type': 'readonly'},
-               {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
-               {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
-               {'title': 'Range', 'name': 'range', 'type': 'str'},
+            #    {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
+            #    {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
+            #    {'title': 'Range', 'name': 'range', 'type': 'str'},
                ] + comon_parameters_fun(is_multiaxes, axis_names = _axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
