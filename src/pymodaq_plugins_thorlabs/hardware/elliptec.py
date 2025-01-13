@@ -90,3 +90,7 @@ class Elliptec:
 
     def get_units(self, actuator): 
        return self.device_info[actuator-1].Units
+    
+    def close(self): 
+        ELLDevicePort.Disconnect()
+        logger.info('Disconnected from Elliptec device')
