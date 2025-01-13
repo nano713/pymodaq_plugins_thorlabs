@@ -32,7 +32,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     """
     _controller_units = ''
     is_multiaxes = True
-    _axis_names: Union[List[str], Dict[str, int]] = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, '11': 11, '12': 12, '13': 13, '14': 14, '15': 15, '16': 16}
+    _axis_names: Union[List[str], Dict[str, int]] = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, '11': 11, '12': 12, '13': 13, '14': 14, '15': 15, '16': 16, '17': 17}
     _controller_units: Union[str, List[str]] = ''
     _epsilon: Union[float, List[float]] = 0.1
 
