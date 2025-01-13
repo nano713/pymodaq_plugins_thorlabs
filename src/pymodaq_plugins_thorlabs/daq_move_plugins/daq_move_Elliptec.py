@@ -11,10 +11,10 @@ from pymodaq.utils.parameter import Parameter
 from typing import Union, List, Dict
 from pymodaq_plugins_thorlabs.hardware.elliptec import Elliptec
 
-from elliptec import Controller, Rotator
-from elliptec.scan import find_ports, scan_for_devices
+# from elliptec import Controller, Rotator
+# from elliptec.scan import find_ports, scan_for_devices
 
-com_ports = find_ports()
+# com_ports = find_ports()
 
 
 class DAQ_Move_Elliptec(DAQ_Move_base):
@@ -36,8 +36,8 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     _controller_units: Union[str, List[str]] = ''
     _epsilon: Union[float, List[float]] = 0.1
 
-    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'list', 'value': 'COM12'},
-              {'title': 'Device Type', 'name': 'device_type', 'type': 'readonly'},
+    params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'str', 'value': 'COM12'},
+              {'title': 'Device Type', 'name': 'device_type', 'type': 'str','readonly':True},
             #    {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
             #    {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
             #    {'title': 'Range', 'name': 'range', 'type': 'str'},
