@@ -30,7 +30,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
          hardware library
 
     """
-    _controller_units = ''
+    _controller_units = ' '
     is_multiaxes = True
     _axis_names: Union[List[str], Dict[str, int]] = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, '11': 11, '12': 12, '13': 13, '14': 14, '15': 15, '16': 16, '17': 17}
     _controller_units: Union[str, List[str]] = ''
@@ -38,7 +38,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
 
     params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'str', 'value': 'COM12'},
               {'title': 'Device Type', 'name': 'device_type', 'type': 'str','readonly':True},
-            #    {'title': 'Serial No.', 'name': 'serial', 'type': 'str'},
+            # {'title': 'Units', 'name': 'units', 'type': 'str', 'readonly': True},
             #    {'title': 'Motor Type', 'name': 'motor', 'type': 'str'},
             #    {'title': 'Range', 'name': 'range', 'type': 'str'},
                ] + comon_parameters_fun(is_multiaxes, axis_names = _axis_names, epsilon=_epsilon)
@@ -53,7 +53,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         -------
         float: The position obtained after scaling conversion.
         """
-        pos = DataActuator(data = self.controller.get_position(self.axis.value), units = self.axis_units)
+        pos = DataActuator(data = self.controller.get_position(self.axis_value), units = self.axis_unit)
         pos = self.get_position_with_scaling(pos)   
         return pos
 
@@ -69,8 +69,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        # if param.name() == 'axis': 
+        # if param.name() == 'units': 
         #     self.axis_unit = self.controller.get_units(self.axis_value)
+        if param.name() == 'axis':
+            units = self.controller.get_units(self.axis_value)
+            self.axis_unit = units            
         # if param.name() == 'range': 
         #     self.controller.set_range(param.value())
         # else:
@@ -95,6 +98,8 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         if self.is_master: 
             self.controller = Elliptec()
             self.controller.connect(self.settings['com_port'])
+            units = self.controller.get_units(self.axis_value)
+            self.axis_unit = units
 
             # serial = Controller(self.settings['com_port'])
             # self.rotator = Rotator(serial)
@@ -144,11 +149,11 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        self.controller.move_rel(self.axis.value, value) 
+        self.controller.move_rel(self.axis_value, value) 
 
     def move_home(self):
         """Call the reference method of the controller"""
-        self.controller.home(self.axis.value)  
+        self.controller.home(self.axis_value)  
         self.emit_status(ThreadCommand('Update_Status', ['Some info you want to log']))
 
     def stop_motion(self):
