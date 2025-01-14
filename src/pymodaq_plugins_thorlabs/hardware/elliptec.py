@@ -59,14 +59,14 @@ class Elliptec:
                 return 'unknown'
 
     #ELLBaseDevice or ELLDevices? 
-    def move_abs(self, actuator, value): 
+    def move_abs(self, actuator, value: float): 
         """
         actuator: index integer of the actuator to move
         """
         boolean = self.elliptec_list[actuator-1].MoveAbsolute(self.device_address[actuator-1], Decimal(value)) # DK - I think the first attribute should be '1'/'2' or 1/2 because this is supposed to be 'address' in the documentation. 
-        return boolean
+        return boolean 
     
-    def move_rel(self, actuator, value): 
+    def move_rel(self, actuator, value: float): 
         boolean = self.elliptec_list[actuator-1].MoveRelative(self.device_address[actuator-1], Decimal(value))
         return boolean
     

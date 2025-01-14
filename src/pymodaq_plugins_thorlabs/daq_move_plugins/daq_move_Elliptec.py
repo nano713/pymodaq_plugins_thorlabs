@@ -34,6 +34,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
     _axis_names: Union[List[str], Dict[str, int]] = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, '11': 11, '12': 12, '13': 13, '14': 14, '15': 15, '16': 16, '17': 17}
     _controller_units: Union[str, List[str]] = ' '
     _epsilon: Union[float, List[float]] = 0.1
+    data_actuator_type = DataActuatorType.DataActuator
 
     params = [ {'title': 'COM port', 'name': 'com_port', 'type': 'str', 'value': 'COM12'},
               {'title': 'Device Type', 'name': 'device_type', 'type': 'str','readonly':True},
@@ -73,7 +74,10 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         #     self.axis_unit = self.controller.get_units(self.axis_value)
         if param.name() == 'axis':
             units = self.controller.get_units(self.axis_value)
-            self.axis_unit = units            
+            self.axis_unit = units 
+            self.settings.child('device_type').setValue(self.controller.get_device_type(self.axis_value))
+            # self.settings['device_type'].setValue(self.controller.get_device_type(self.axis_value)) 
+                      
         # if param.name() == 'range': 
         #     self.controller.set_range(param.value())
         # else:
@@ -99,6 +103,8 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
             self.controller = Elliptec()
             self.controller.connect(self.settings['com_port'])
             units = self.controller.get_units(self.axis_value)
+            # self.settings['device_type'].setValue(self.controller.get_device_type(self.axis_value))
+            self.settings.child('device_type').setValue(self.controller.get_device_type(self.axis_value))
             self.axis_unit = units
 
             # serial = Controller(self.settings['com_port'])
@@ -129,14 +135,14 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
 
         Parameters
         ----------
-        value: (float) value of the absolute target positioning
+        value: (DataActuator) value of the absolute target positioning
         """
 
         value = self.check_bound(value)  
         self.target_value = value
         value = self.set_position_with_scaling(value)
 
-        self.controller.move_abs(self.axis_value, value)
+        self.controller.move_abs(self.axis_value, value.value())
 
     def move_rel(self, value: DataActuator):
         """ Move the actuator to the relative target actuator value defined by value
@@ -149,7 +155,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         self.target_value = value + self.current_position
         value = self.set_position_relative_with_scaling(value)
 
-        self.controller.move_rel(self.axis_value, value) 
+        self.controller.move_rel(self.axis_value, value.value()) 
 
     def move_home(self):
         """Call the reference method of the controller"""
