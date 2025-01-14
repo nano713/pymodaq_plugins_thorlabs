@@ -75,3 +75,9 @@ Required libraries are installed using the free
 `ThorCam <https://www.thorlabs.com/software_pages/ViewSoftwarePage.cfm?Code=ThorCam>`__ software.
 The plugin assumes Thorcam is installed in default folder
 (see `details here <https://pylablib.readthedocs.io/en/stable/devices/Thorlabs_TLCamera.html>`__). Tested on Zelux camera on Windows.
+
+Elliptec
+++++++++
+Download a required software in `Elliptec® Software <https://www.thorlabs.com/software_pages/ViewSoftwarePage.cfm?Code=ELL>`__. The plugin
+assumes the software is installed in the default folder and refer to the Loading Multiple Devices 
+in `C:\Program Files\Thorlabs\Elliptec\Thorlabs.Elliptec.ELLO.chm`
