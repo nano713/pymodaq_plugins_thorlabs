@@ -53,7 +53,7 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
         float: The position obtained after scaling conversion.
         """
         pos = DataActuator(data = self.controller.get_position(self.axis_value), 
-        unit = self._controller_units)
+        units = self.controller.get_units(self.axis_value))
         pos = self.get_position_with_scaling(pos)   
         return pos
 
