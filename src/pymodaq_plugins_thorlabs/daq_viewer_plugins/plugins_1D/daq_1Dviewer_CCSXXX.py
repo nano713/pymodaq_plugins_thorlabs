@@ -19,8 +19,8 @@ class DAQ_1DViewer_CCSXXX(DAQ_Viewer_base):
 
     """
     params = comon_parameters + [
-        {'title': 'Exposure (s)', 'name': 'exposure', 'type': 'float', 'value': 100.0e-3}, # in seconds
-        {'title': 'Resource name', 'name': 'resource_name', 'type': 'str', 'value': 'USB0::0x1313::0x8087::M00934802::RAW'},
+        {'title': 'Integration Time (s)', 'name': 'integration_time', 'type': 'float', 'value': 100.0e-3}, # in seconds
+        {'title': 'Resource Name', 'name': 'resource_name', 'type': 'str', 'value': 'USB0::0x1313::0x8087::M00934802::RAW'},
     ]
 
     def ini_attributes(self):
@@ -36,8 +36,8 @@ class DAQ_1DViewer_CCSXXX(DAQ_Viewer_base):
         param: Parameter
             A given parameter (within detector_settings) whose value has been changed by the user
         """
-        if param.name() == "exposure":
-            self.controller.set_integration_time(self.settings['exposure'])
+        if param.name() == "integration_time":
+            self.controller.set_integration_time(self.settings['integration_time'])
 
     def ini_detector(self, controller=None):
         """Detector communication initialization
